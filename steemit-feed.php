@@ -56,7 +56,8 @@ function display_steemit($atts, $content = null) {
         'postauthor' => isset($options[ 'mn_steemit_post_author' ]) ? $options[ 'mn_steemit_post_author' ] : '',
         'posttag' => isset($options[ 'mn_steemit_post_tag' ]) ? $options[ 'mn_steemit_post_tag' ] : '',
         'postvotes' => isset($options[ 'mn_steemit_post_votes' ]) ? $options[ 'mn_steemit_post_votes' ] : '',
-        'postreplies' => isset($options[ 'mn_steemit_post_replies' ]) ? $options[ 'mn_steemit_post_replies' ] : ''
+        'postreplies' => isset($options[ 'mn_steemit_post_replies' ]) ? $options[ 'mn_steemit_post_replies' ] : '',
+        'excludedtags' => isset($options[ 'mn_steemit_excluded_tags' ]) ? $options[ 'mn_steemit_excluded_tags' ] : '',
     ), $atts);
 
     /******************* VARS ********************/
@@ -159,18 +160,29 @@ function mn_render_steem_feed() {
 	$decodeatts = urldecode($atts);
 	$atts = json_decode($decodeatts, true);
 
+	$excluded_tags = array_map( 'trim', explode( ',', $atts['excludedtags'] ) );
+
 	if (count($decodejson))
 	{
 		$html .= '<ul class="sf-list">';
 			
 			foreach ($decodejson as $key => $item)
 			{				
+				// Metadata
+				$metadata = json_decode($item->json_metadata, false);
+
+				foreach ( (array) $metadata->tags as $tag )
+				{
+					if ( in_array( $tag, $excluded_tags ) )
+					{
+						continue 2;
+					}
+				}
+
 				$html .= '<li class="sf-li">';
 						 
 					$html .= '<article>';
 					
-						// Metadata
-						$metadata = json_decode($item->json_metadata, false);
 						
 						// Image
 						if ($atts['postimage'] === 1 || $atts['postimage'] === '1' || $atts['postimage'] === true || $atts['postimage'] === 'true')

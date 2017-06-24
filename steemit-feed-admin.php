@@ -44,7 +44,8 @@ function mn_steemit_settings_page() {
         'mn_steemit_post_author'			=> true,
         'mn_steemit_post_tag'				=> true,
         'mn_steemit_post_votes'				=> true,
-        'mn_steemit_post_replies'			=> true
+        'mn_steemit_post_replies'			=> true,
+        'mn_steemit_excluded_tags'			=> '',
     );
     //Save defaults in an array
     $options = wp_parse_args(get_option('mn_steemit_settings'), $mn_steemit_settings_defaults);
@@ -67,6 +68,7 @@ function mn_steemit_settings_page() {
     $mn_steemit_post_tag = $options[ 'mn_steemit_post_tag' ];
     $mn_steemit_post_votes = $options[ 'mn_steemit_post_votes' ];
     $mn_steemit_post_replies = $options[ 'mn_steemit_post_replies' ];
+    $mn_steemit_excluded_tags = $options[ 'mn_steemit_excluded_tags' ];
 
     //Check nonce before saving data
     if ( ! isset( $_POST['mn_steemit_settings_nonce'] ) || ! wp_verify_nonce( $_POST['mn_steemit_settings_nonce'], 'mn_steemit_saving_settings' ) ) {
@@ -100,6 +102,7 @@ function mn_steemit_settings_page() {
                 $mn_steemit_post_tag = sanitize_text_field( $_POST[ 'mn_steemit_post_tag' ] );
                 $mn_steemit_post_votes = sanitize_text_field( $_POST[ 'mn_steemit_post_votes' ] );
                 $mn_steemit_post_replies = sanitize_text_field( $_POST[ 'mn_steemit_post_replies' ] );
+                $mn_steemit_excluded_tags = sanitize_text_field( $_POST[ 'mn_steemit_excluded_tags' ] );
                 
 				$options[ 'mn_steemit_posts_count' ] = $mn_steemit_posts_count;
                 $options[ 'mn_steemit_post_image' ] = $mn_steemit_post_image;
@@ -112,6 +115,7 @@ function mn_steemit_settings_page() {
                 $options[ 'mn_steemit_post_tag' ] = $mn_steemit_post_tag;
                 $options[ 'mn_steemit_post_votes' ] = $mn_steemit_post_votes;
                 $options[ 'mn_steemit_post_replies' ] = $mn_steemit_post_replies;
+                $options[ 'mn_steemit_excluded_tags' ] = $mn_steemit_excluded_tags;
                 
             } //End Post Settings tab post
             
@@ -303,6 +307,14 @@ function mn_steemit_settings_page() {
                         </select>
                     </td>
                 </tr>
+
+				<tr valign="top">
+                    <th scope="row"><label><?php _e('Excluded Tags', 'steemit-feed'); ?></label></th>
+                    <td>
+                        <input name="mn_steemit_excluded_tags" type="text" value="<?php echo esc_attr( $mn_steemit_excluded_tags ); ?>" size="40" />
+						<p class="howto"><?php _e('Separate tags with commas.', 'steemit-feed'); ?></p>
+                    </td>
+                </tr>
 				
             </tbody>
         </table>
@@ -404,6 +416,11 @@ function mn_steemit_settings_page() {
                     <td>postreplies</td>
                     <td><?php _e("Show post replies (true or false).", 'steemit-feed'); ?></td>
                     <td><code>[steemit-feed postreplies="true"]</code></td>
+                </tr>
+                <tr>
+                    <td>excludedtags</td>
+                    <td><?php _e("Exclude certain tags (separated with commas).", 'steemit-feed'); ?></td>
+                    <td><code>[steemit-feed excludedtags="foo,bar"]</code></td>
                 </tr>
                 
             </tbody>
