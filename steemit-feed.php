@@ -162,6 +162,9 @@ function mn_render_steem_feed() {
 
 	$excluded_tags = array_map( 'trim', explode( ',', $atts['excludedtags'] ) );
 
+	$item->title = stripslashes( $item->title );
+	$item->body  = stripslashes( $item->body );
+
 	if (count($decodejson))
 	{
 		$html .= '<ul class="sf-list">';
@@ -208,7 +211,8 @@ function mn_render_steem_feed() {
 							// Body
 							if ($atts['postcontent'] === 1 || $atts['postcontent'] === '1' || $atts['postcontent'] === true || $atts['postcontent'] === 'true')
 							{
-								$itemBody = sf_word_limit($item->body, $atts['wordlimit']);
+								$itemBody = sf_clear_text($item->body);
+								$itemBody = sf_word_limit($itemBody, $atts['wordlimit']);
 								$html .= '<div class="sf-li-body">'.$itemBody.'</div>';
 							}
 							
@@ -310,6 +314,16 @@ function sf_is_json($string)
 	json_decode($string);
 	
 	return (json_last_error() == JSON_ERROR_NONE);
+}
+
+function sf_clear_text( $text ) {
+	$text = preg_replace( '/#(.*?)#/', '$1', $text );          // Headers
+	$text = preg_replace( '/!\[.*?\]\(.*?\)/', '', $text );    // Images
+	$text = preg_replace( '/\[(.*?)\]\(.*?\)/', '$1', $text ); // Links
+	$text = preg_replace( '/\*(.*?)\*/', '$1', $text );        // Bold or italics
+	$text = preg_replace( '/_(.*?)_/', '$1', $text );          // Bold or italics
+
+	return $text;
 }
 
 function sf_word_limit($str, $limit = 20, $end_char = '&#8230;') 
