@@ -115,7 +115,7 @@ function display_steemit($atts, $content = null) {
 					var encoded_atts = '".$encoded_atts."';
 					mn_sf_limit = parseInt(mn_sf_limit, 10);
 				
-					steem.getDiscussionsByAuthorBeforeDate(mn_sf_author, '', mn_sf_datenow, mn_sf_limit, function(err, response)
+					steem.api.getDiscussionsByAuthorBeforeDate(mn_sf_author, '', mn_sf_datenow, mn_sf_limit, function(err, response)
 					{
 						if (typeof response === 'object')
 						{
@@ -399,7 +399,7 @@ function mn_steemit_styles_enqueue() {
 add_action( 'wp_enqueue_scripts', 'mn_steemit_scripts_enqueue' );
 function mn_steemit_scripts_enqueue() {
     //Register the script to make it available
-    wp_register_script( 'mn_steemit_scripts', plugins_url( '/js/steem.min.js' , __FILE__ ), array('jquery'), MNSFVER, true );
+    wp_register_script( 'mn_steemit_scripts', 'https://cdn.steemjs.com/lib/latest/steem.min.js', array('jquery'), MNSFVER, true );
 
     //Options to pass to JS file
     $mn_steemit_settings = get_option('mn_steemit_settings');
@@ -409,9 +409,6 @@ function mn_steemit_scripts_enqueue() {
 
     //Enqueue it to load it onto the page
     if( !$mn_steemit_ajax_theme ) wp_enqueue_script('mn_steemit_scripts');
-
-    //Pass option to JS file
-    wp_localize_script('mn_steemit_scripts', 'mn_steemit_js_options', $data);
 }
 
 //Run function on plugin activate
